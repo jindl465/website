@@ -346,6 +346,27 @@
     .player-bar .now strong { color: var(--ink); font-weight: 600; }
     .player-bar .hint { margin-left: auto; font-size: 0.8rem; }
 
+    .try-box {
+      margin: 20px 0 36px;
+      padding: 22px 24px 14px;
+      background: var(--ours-bg);
+      border: 1px solid #c9dcfb;
+      border-left: 5px solid var(--accent);
+      border-radius: 10px;
+    }
+    .try-kicker {
+      margin: 0;
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--accent);
+    }
+    .try-title { margin: 2px 0 8px; font-size: 1.3rem; font-weight: 700; line-height: 1.35; }
+    .try-steps { margin: 0 0 4px; padding-left: 1.3em; color: var(--ink-soft); }
+    .try-steps li { margin: 2px 0; }
+    .try-box .player { margin-top: 14px; }
+    .try-box .tile { background: var(--bg); }
+    @media (max-width: 640px) { .try-box { padding: 18px 14px 10px; } }
+
     .quiz .tile .cap .who { display: none; color: var(--ink-soft); font-weight: 500; }
     .quiz.revealed .tile .cap .who { display: inline; }
     .quiz:not(.revealed) .tile.ours { border-color: var(--line); }
@@ -747,20 +768,30 @@
   <section id="user-study">
     <p class="eyebrow">Results &middot; User study</p>
     <h2>Which video is the most out of sync?</h2>
+
+    <div class="try-box">
+      <p class="try-kicker">&#127919; Try it yourself</p>
+      <p class="try-title">Can you spot the most out-of-sync video?</p>
+      <ol class="try-steps">
+        <li>Pick a sample and press <strong>&#9654; Play all</strong>. Clips from the study appear in a shuffled order.</li>
+        <li>Choose the one whose lips match the speech the least.</li>
+        <li>Press <strong>Reveal methods</strong> to see if you picked MUTE.</li>
+      </ol>
+      <div class="player quiz" data-player="quiz"></div>
+    </div>
+
+    <h3>Study results</h3>
     <div class="split">
       <div>
         <p>
           Participants watched videos generated from audio protected by MUTE, CAF, ARO and SAGO and picked the one with the most noticeable lip-sync mismatch. With 100 participants and 10 samples (1,000 responses), <strong>MUTE was chosen in 78.1% &plusmn; 2.56%</strong> (95% CI) of cases, against 13.2% for CAF, 5.2% for ARO and 3.5% for SAGO.
         </p>
-        <p><strong>Try it yourself.</strong> The clips below come from the study and are shown in a shuffled order. Pick the one you think is most out of sync, then reveal the methods.</p>
       </div>
       <figure class="figure-slot">
         <img src="assets/fig4.png" alt="User study bar chart: MUTE selected in 78.1% of responses, CAF 13.2%, ARO 5.2%, SAGO 3.5%">
         <figcaption><strong>Figure 4.</strong> Share of responses per question and in total.</figcaption>
       </figure>
     </div>
-
-    <div class="player quiz" data-player="quiz"></div>
   </section>
 </div>
 
