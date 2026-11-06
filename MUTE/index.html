@@ -523,6 +523,7 @@
       <!-- <a class="hero-btn" href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank">&#128209; arXiv</a> -->
       <a class="hero-btn" href="https://github.com/jindl465/MUTE" target="_blank">&#128187; Code</a>
       <a class="hero-btn" href="#demos">&#9654; Demos</a>
+      <a class="hero-btn" href="#user-study">&#128101; User Study</a>
       <a class="hero-btn" href="#bibtex">&#128203; BibTeX</a>
     </div>
   </div>
@@ -532,9 +533,9 @@
 <div class="wrap">
   <section>
     <figure class="figure-slot">
-      <img src="assets/fig1.jpg" alt="Overview of MUTE: protected audio produces unsynchronized talking-head output even under black-box models, post-processing, adaptive attacks and TTS resynthesis">
+      <img src="assets/fig1.jpg" alt="Overview of MUTE: protected audio produces unsynchronized talking-head output even under black-box models, post-processing, denoising and adaptive attacks">
       <figcaption>
-        <strong>Figure 1. Overview of MUTE.</strong> MUTE protects audio before it can be misused for talking-head synthesis. Even when the attacker uses an unseen black-box model, applies post-processing, denoising or adaptive attacks, or resynthesizes the voice with TTS, the generated video stays visibly out of sync with the speech.
+        <strong>Figure 1. Overview of MUTE.</strong> MUTE protects audio before it can be misused for talking-head synthesis. Even when the attacker uses an unseen black-box model or applies post-processing, denoising or adaptive attacks, the generated video stays visibly out of sync with the speech.
       </figcaption>
     </figure>
   </section>
@@ -886,9 +887,10 @@
       { label: 'Sample 1', dir: 'image/0051',
         items: ['gt', 'mis', 'mis_caf', 'mis_mute', null, 'silencer', 'silencer_caf', 'silencer_mute'] },
       { label: 'Sample 2', dir: 'image/0012',
-        items: [null, 'mis', 'mis_caf', 'mis_mute', null, 'silencer', 'silencer_caf', 'silencer_mute'] } ] },
+        items: ['gt', 'mis', 'mis_caf', 'mis_mute', null, 'silencer', 'silencer_caf', 'silencer_mute'] } ] },
     quiz: { cols: 4, quiz: true, items: ['aro', 'caf', 'mute', 'sago'], tabs: [
-      'celeb_0024', 'celeb_0026', 'celeb_0027', 'celeb_0044', 'th_0008', 'th_0029', 'th_0052'
+      'celeb_0024', 'celeb_0026', 'celeb_0027', 'celeb_0044',
+      'th_0005', 'th_0008', 'th_0021', 'th_0029', 'th_0052', 'th_0064'
     ].map((d, i) => ({ label: 'Sample ' + (i + 1), dir: 'userstudy/' + d })) }
   };
 
