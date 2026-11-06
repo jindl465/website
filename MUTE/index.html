@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MUTE: Multi-Level Alignment Uncoupling Against Talking-Head Exploitation for Voice Protection, NeurIPS 2026">
+  <meta name="author" content="Donghyun Kim, Jin Hong, Seungmin Kim, Dain Kim, Junseok Kwon, Deaseon Choi">
+  <title>MUTE | NeurIPS 2026</title>
+
+  <meta property="og:title" content="MUTE: Multi-Level Alignment Uncoupling Against Talking-Head Exploitation for Voice Protection">
+  <meta property="og:description" content="An audio protection framework that breaks the audio-visual alignment talking-head models depend on, while keeping speech natural. NeurIPS 2026.">
+  <meta property="og:image" content="assets/fig1.jpg">
+  <meta property="og:type" content="website">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #222;
+      --ink-soft: #555;
+      --line: #ddd;
+      --bg: #ffffff;
+      --bg-2: #f5f5f5;
+      --accent: #1772d0;
+      --ours-bg: #eef4ff;
+      --max-w: 960px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 400;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .wrap {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    h1, h2, h3 { line-height: 1.35; }
+
+    .eyebrow {
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 8px;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* ========== Hero ========== */
+    .hero {
+      text-align: center;
+      padding: 64px 0 40px;
+    }
+
+    .venue-pill {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: 4px;
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 14px;
+    }
+
+    .hero .subtitle {
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+      margin: 0 auto 24px;
+      max-width: 680px;
+    }
+
+    .authors {
+      font-size: 1.02rem;
+      margin: 0 0 4px;
+    }
+    .authors strong { font-weight: 600; }
+
+    .affiliation {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      margin: 0 0 4px;
+    }
+
+    .equal-note {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      margin: 0 0 24px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--ink);
+      transition: background 0.15s ease;
+    }
+    .hero-btn:hover {
+      background: var(--bg-2);
+      text-decoration: none;
+    }
+
+    /* ========== Sections ========== */
+    section {
+      padding: 40px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    section h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+
+    section h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin: 32px 0 8px;
+    }
+
+    section p, section li {
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+
+    .lead {
+      font-size: 1rem;
+      color: var(--ink-soft);
+      margin-bottom: 16px;
+    }
+
+    /* ========== Figures ========== */
+    .figure-slot {
+      margin: 24px 0;
+      text-align: center;
+    }
+
+    .figure-slot img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    figcaption {
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      margin-top: 12px;
+      text-align: left;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 32px;
+      align-items: start;
+    }
+    .split .figure-slot { margin: 0; }
+
+    /* ========== Lists ========== */
+    .contrib-list, .loss-list {
+      margin: 20px 0 0;
+      padding-left: 20px;
+    }
+
+    .contrib-list li, .loss-list li {
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .contrib-list li strong, .loss-list li strong {
+      font-weight: 600;
+    }
+
+    .eq {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      padding: 6px 12px;
+      margin: 6px 0 2px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    /* ========== Video comparison players ========== */
+    .player { margin: 20px 0 8px; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .tab {
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 5px 14px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--bg);
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .tab:hover { background: var(--bg-2); }
+    .tab[aria-selected="true"] {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+    }
+
+    .vgrid {
+      display: grid;
+      grid-template-columns: repeat(var(--cols, 4), 1fr);
+      gap: 8px;
+    }
+
+    .tile {
+      position: relative;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .tile video {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+
+    .tile .cap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 5px 8px;
+      line-height: 1.4;
+    }
+
+    .tile .spk { font-size: 0.85rem; opacity: 0.35; }
+    .tile.listening { box-shadow: 0 0 0 2px var(--ink); border-color: var(--ink); }
+    .tile.listening .spk { opacity: 1; }
+
+    .tile.ours { border-color: var(--accent); }
+    .tile.ours .cap { background: var(--ours-bg); font-weight: 700; }
+    .tile.ours.listening { box-shadow: 0 0 0 2px var(--accent); }
+
+    .tile.empty {
+      cursor: default;
+      border-style: dashed;
+      background: var(--bg-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 0.8rem;
+      min-height: 80px;
+    }
+
+    .row-label {
+      grid-column: 1 / -1;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin: 6px 0 -2px;
+    }
+
+    .player-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+    }
+
+    .pbtn {
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--bg);
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .pbtn:hover { background: var(--bg-2); }
+    .pbtn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .pbtn.primary:hover { background: #444; }
+
+    .player-bar .now strong { color: var(--ink); font-weight: 600; }
+    .player-bar .hint { margin-left: auto; font-size: 0.8rem; }
+
+    .quiz .tile .cap .who { display: none; color: var(--ink-soft); font-weight: 500; }
+    .quiz.revealed .tile .cap .who { display: inline; }
+    .quiz:not(.revealed) .tile.ours { border-color: var(--line); }
+    .quiz:not(.revealed) .tile.ours .cap { background: none; font-weight: 500; }
+    .quiz:not(.revealed) .tile.ours.listening { box-shadow: 0 0 0 2px var(--ink); border-color: var(--ink); }
+
+    /* ========== Tables ========== */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 20px 0;
+      border: 1px solid var(--line);
+    }
+
+    .table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .table-wrap thead th {
+      background: var(--bg-2);
+      font-weight: 600;
+      text-align: center;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    .table-wrap thead tr:last-child th { border-bottom: 2px solid var(--line); }
+    .table-wrap thead th.grp { border-left: 1px solid var(--line); }
+
+    .table-wrap thead th:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--bg-2);
+    }
+
+    .table-wrap tbody td {
+      text-align: center;
+      padding: 7px 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .table-wrap tbody td:first-child {
+      text-align: left;
+      font-weight: 500;
+      position: sticky;
+      left: 0;
+      background: #fff;
+      z-index: 1;
+    }
+
+    .table-wrap tbody tr:last-child td { border-bottom: none; }
+    .table-wrap td b { font-weight: 700; }
+
+    .table-wrap tbody tr.ours td,
+    .table-wrap tbody tr.ours td:first-child { background: var(--ours-bg); font-weight: 600; }
+
+    .table-wrap tbody tr.ref td { color: #888; }
+
+    .table-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 28px 0 6px;
+    }
+    .table-label + .table-wrap { margin-top: 6px; }
+
+    .table-note {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      margin: 8px 0 0;
+      line-height: 1.55;
+    }
+
+    .ablation-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr 1fr;
+      gap: 18px;
+    }
+    .ablation-grid > div { min-width: 0; }
+    .ablation-grid .table-wrap { margin: 6px 0 0; }
+    .ablation-grid .table-wrap thead th, .ablation-grid .table-wrap tbody td { padding: 7px 6px; }
+
+    /* ========== BibTeX ========== */
+    .bibtex-block {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      padding: 20px 24px;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .bibtex-block pre {
+      margin: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: #fff;
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover { background: var(--bg-2); }
+
+    /* ========== Footer ========== */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 32px 0;
+      text-align: center;
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 860px) {
+      .split { grid-template-columns: 1fr; }
+      .split .figure-slot { max-width: 320px; margin: 0 auto; }
+      .ablation-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .hero h1 { font-size: 1.5rem; }
+      section { padding: 28px 0; }
+      .vgrid { --cols: 2 !important; }
+      .row-label { display: none; }
+      .tile.empty { display: none; }
+      .player-bar .hint { margin-left: 0; width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="wrap">
+  <div class="hero">
+    <div class="venue-pill">NeurIPS 2026</div>
+    <h1>MUTE: Multi-Level Alignment Uncoupling Against Talking-Head Exploitation for Voice Protection</h1>
+    <p class="subtitle">Imperceptible audio perturbations that break the audio&ndash;visual alignment talking-head models rely on, so a stolen voice can no longer drive a convincing lip-synced deepfake.</p>
+    <p class="authors">
+      <strong>Donghyun Kim</strong>*&sup1;,
+      <strong>Jin Hong</strong>*&sup2;,
+      <strong>Seungmin Kim</strong>*&sup1;<sup>,</sup>&sup3;,
+      <strong>Dain Kim</strong>&sup1;,
+      <strong>Junseok Kwon</strong>&dagger;&sup2;,
+      <strong>Deaseon Choi</strong>&dagger;&sup1;
+    </p>
+    <p class="affiliation">&sup1;Soongsil University &nbsp;&nbsp; &sup2;Chung-Ang University &nbsp;&nbsp; &sup3;AIM Intelligence</p>
+    <p class="equal-note">* Equal contribution &nbsp;&nbsp; &dagger; Corresponding authors</p>
+    <div class="hero-buttons">
+      <a class="hero-btn" href="assets/paper.pdf" target="_blank">&#128196; Paper</a>
+      <!-- <a class="hero-btn" href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank">&#128209; arXiv</a> -->
+      <a class="hero-btn" href="https://github.com/jindl465/MUTE" target="_blank">&#128187; Code</a>
+      <a class="hero-btn" href="#demos">&#9654; Demos</a>
+      <a class="hero-btn" href="#bibtex">&#128203; BibTeX</a>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TEASER ==================== -->
+<div class="wrap">
+  <section>
+    <figure class="figure-slot">
+      <img src="assets/fig1.jpg" alt="Overview of MUTE: protected audio produces unsynchronized talking-head output even under black-box models, post-processing, adaptive attacks and TTS resynthesis">
+      <figcaption>
+        <strong>Figure 1. Overview of MUTE.</strong> MUTE protects audio before it can be misused for talking-head synthesis. Even when the attacker uses an unseen black-box model, applies post-processing, denoising or adaptive attacks, or resynthesizes the voice with TTS, the generated video stays visibly out of sync with the speech.
+      </figcaption>
+    </figure>
+  </section>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<div class="wrap">
+  <section>
+    <p class="eyebrow">Abstract</p>
+    <p class="lead">
+      Talking-head generation models, which synthesize realistic facial animations from audio, are increasingly vulnerable to misuse in multimodal deepfake scenarios. Protecting against them is hard: these models depend on precise audio&ndash;visual alignment, yet effective audio protection methods remain largely underexplored.
+    </p>
+    <p>
+      We propose <strong>MUTE</strong>, an audio protection framework that uncouples the underlying audio&ndash;visual alignment through a multi-level strategy. MUTE combines (1) <strong>Alignment-level Disruption</strong>, which directly perturbs cross-modal attention to disrupt structural alignment, and (2) <strong>Representation-level Degradation</strong>, which perturbs temporal audio embeddings to degrade their representations. To improve robustness, perturbations are constrained in the STFT domain to high-energy regions, making them resistant to post-processing, denoising, and adaptive attacks. An optional speaker-level objective further mitigates bypass via TTS-based resynthesis. MUTE consistently degrades lip synchronization across both white-box and black-box talking-head models while preserving perceptual audio quality, remains effective under real-world transformations, and can be combined with image-based approaches for stronger multimodal protection.
+    </p>
+
+    <ul class="contrib-list">
+      <li><strong>Multi-level uncoupling.</strong> An audio protection framework that combines alignment-level disruption and representation-level degradation to break the audio&ndash;visual coupling that talking-head generation depends on.</li>
+      <li><strong>Black-box transferability.</strong> By targeting model-agnostic audio&ndash;visual alignment, perturbations crafted on one surrogate (Hallo) transfer to Hallo2, Audio2Head, SadTalker and Ditto.</li>
+      <li><strong>Robustness by design.</strong> An STFT-domain constraint keeps perturbations in high-energy speech regions, resisting resampling, filtering, Demucs, WavePurifier, BPDA and EOT; an optional speaker-level objective counters TTS resynthesis.</li>
+      <li><strong>Complementary to image protection.</strong> MUTE works on audio alone and stacks with image-based methods such as MIS and Silencer for stronger multimodal protection.</li>
+    </ul>
+  </section>
+</div>
+
+<!-- ==================== METHOD ==================== -->
+<div class="wrap">
+  <section id="method">
+    <p class="eyebrow">Method</p>
+    <h2>Uncoupling audio&ndash;visual alignment at two levels</h2>
+    <p>
+      Given clean audio <i>x</i>, MUTE crafts <i>x</i><sub>adv</sub> = <i>x</i> + &delta; with &#8214;&delta;&#8214;<sub>&infin;</sub> &le; &epsilon;, optimized with PGD on a surrogate latent-diffusion talking-head model (Hallo). Only the audio is modified; the attacker's portrait is left untouched.
+    </p>
+
+    <figure class="figure-slot">
+      <img src="assets/fig2.png" alt="MUTE framework: alignment-level KL loss on cross-attention maps, representation-level frame-wise cosine loss on audio embeddings, and an STFT-domain robustness loss, optimized with PGD">
+      <figcaption>
+        <strong>Figure 2. Overall framework of MUTE.</strong> The framework uncouples audio&ndash;visual alignment through a multi-level strategy, combining alignment-level disruption and representation-level degradation, while an STFT loss keeps the perturbation robust.
+      </figcaption>
+    </figure>
+
+    <ul class="loss-list">
+      <li><strong>Alignment-level disruption (&Lscr;<sub>attn</sub>).</strong> The audio-conditioned cross-attention in the denoising UNet (visual latents as queries, audio embeddings as keys/values) is treated as a proxy for the alignment structure. A Taylor-expansion sensitivity score identifies the spatial locations whose attention can be shifted most under an &epsilon;-bounded perturbation, defining a target distribution <i>A</i><sub>target</sub> = softmax(<i>s</i>). A <em>Target Attention KL loss</em> then pushes the adversarial attention toward it.
+        <span class="eq">L_attn = KL( A_target || A_adv )</span></li>
+      <li><strong>Representation-level degradation (&Lscr;<sub>emb</sub>).</strong> Talking-head models drive frame-level motion from temporal wav2vec&nbsp;2.0 embeddings, so perturbing only a global embedding is not enough. The <em>Frame-wise Embedding Cosine loss</em> lowers the similarity at every time step, preventing local perturbations from being averaged away.
+        <span class="eq">L_emb = (1/T) &Sigma;_t cos( z_t^adv , z_t )</span></li>
+      <li><strong>Robustness to post-processing, denoising and adaptive attacks (&Lscr;<sub>stft</sub>).</strong> A mask <i>M</i> built from the clean spectrogram keeps the perturbation in high-energy time&ndash;frequency regions of the speech itself, where filters and denoisers cannot remove it without also removing the speech.
+        <span class="eq">L_stft = || &delta; &minus; ISTFT( M &odot; STFT(&delta;) ) ||&sup2;</span></li>
+      <li><strong>Speaker-level objective (&Lscr;<sub>spk</sub>, optional).</strong> To resist an attacker who clones the voice with TTS, MUTE can also lower speaker-embedding similarity using an ensemble of CAM++ and a ResNet speaker encoder.</li>
+      <li><strong>Two-phase optimization.</strong> The first &rho;K iterations minimize &Lscr;<sub>attn</sub> + &lambda;&Lscr;<sub>stft</sub>; the remaining ones minimize &Lscr;<sub>emb</sub> + &lambda;&Lscr;<sub>stft</sub>. Separating the objectives reduces gradient interference and cost (&rho; = 0.1, &lambda; = 5, &epsilon; = 0.004, 200 PGD steps).</li>
+    </ul>
+  </section>
+</div>
+
+<!-- ==================== RESULTS: VOICE PROTECTION ==================== -->
+<div class="wrap">
+  <section id="demos">
+    <p class="eyebrow">Results &middot; Voice protection</p>
+    <h2>Protected audio breaks lip sync</h2>
+    <p>
+      Talking-head videos generated by the surrogate model Hallo from the same portrait, driven either by clean audio (GT) or by audio protected with each method. All videos play in sync; <strong>click any video to hear its audio</strong>. The perturbations are hard to hear, but MUTE's lip motion visibly drifts away from the speech.
+    </p>
+
+    <div class="player" data-player="main"></div>
+
+    <figure class="figure-slot">
+      <img src="assets/fig3.jpg" alt="Qualitative comparison: frames and lip crops for GT, C&amp;W, Psychoacoustic, Qin et al., ARO, SAGO, CAF and MUTE">
+      <figcaption>
+        <strong>Figure 3. Qualitative results</strong> on (a) TalkingHead-1KH and (b) CelebV-HQ. MUTE produces the largest deviation in facial dynamics and lip shape from the ground truth.
+      </figcaption>
+    </figure>
+
+    <p class="table-label">Table 1: Comparison with audio adversarial attack baselines (surrogate: Hallo)</p>
+    <div class="table-wrap"><table>
+<thead>
+<tr><th></th><th colspan="8" class="grp">TalkingHead-1KH</th><th colspan="8" class="grp">CelebV-HQ</th></tr>
+<tr><th>Method</th><th>WER&darr;</th><th>STOI&uarr;</th><th>PESQ&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>FID&uarr;</th><th>FVD&uarr;</th><th>E-FID&uarr;</th><th>WER&darr;</th><th>STOI&uarr;</th><th>PESQ&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>FID&uarr;</th><th>FVD&uarr;</th><th>E-FID&uarr;</th></tr>
+</thead><tbody>
+<tr><td>C&amp;W</td><td>13.397</td><td>0.922</td><td>2.322</td><td>3.740</td><td>1.096</td><td>1.855</td><td>1.442</td><td>3.646</td><td>13.057</td><td>0.948</td><td>2.702</td><td>4.039</td><td>1.108</td><td>1.662</td><td>1.247</td><td>3.508</td></tr>
+<tr><td>Psychoacoustic</td><td>12.140</td><td>0.922</td><td>2.333</td><td>3.787</td><td>1.097</td><td>1.914</td><td>1.427</td><td>3.655</td><td>11.643</td><td>0.949</td><td>2.740</td><td>3.926</td><td>1.126</td><td>1.676</td><td>1.276</td><td>3.457</td></tr>
+<tr><td>Qin et al.</td><td>15.649</td><td>0.925</td><td>2.301</td><td>4.468</td><td>0.983</td><td>1.825</td><td>1.329</td><td>3.443</td><td>13.870</td><td>0.942</td><td>2.544</td><td>4.543</td><td>1.054</td><td>1.479</td><td>1.182</td><td>3.331</td></tr>
+<tr><td>ARO</td><td>15.673</td><td>0.903</td><td>2.518</td><td>3.518</td><td>1.155</td><td>1.983</td><td>1.510</td><td>3.662</td><td>13.870</td><td>0.931</td><td>2.689</td><td>3.818</td><td>1.176</td><td>1.574</td><td>1.260</td><td>3.457</td></tr>
+<tr><td>SAGO</td><td>12.463</td><td>0.930</td><td>2.515</td><td>3.264</td><td>1.200</td><td>2.176</td><td>1.667</td><td>4.115</td><td>11.970</td><td>0.956</td><td>2.912</td><td>3.597</td><td>1.226</td><td>1.894</td><td>1.399</td><td>3.963</td></tr>
+<tr><td>CAF</td><td>12.143</td><td>0.925</td><td>2.292</td><td>2.173</td><td>1.341</td><td>2.928</td><td>2.268</td><td>5.435</td><td>14.624</td><td>0.947</td><td>2.652</td><td>2.570</td><td>1.334</td><td>2.732</td><td>1.709</td><td>4.734</td></tr>
+<tr class="ours"><td>MUTE</td><td><b>11.681</b></td><td><b>0.936</b></td><td><b>2.522</b></td><td><b>1.332</b></td><td><b>1.627</b></td><td><b>3.183</b></td><td><b>2.363</b></td><td><b>5.489</b></td><td><b>10.467</b></td><td><b>0.959</b></td><td><b>2.940</b></td><td><b>2.152</b></td><td><b>1.693</b></td><td><b>2.756</b></td><td><b>1.790</b></td><td><b>5.062</b></td></tr>
+<tr class="ref"><td>GT</td><td>0.000</td><td>1.000</td><td>4.500</td><td>5.656</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.000</td><td>1.000</td><td>4.500</td><td>5.294</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.000</td></tr>
+</tbody></table></div>
+    <p class="table-note">MUTE gives the lowest SyncNet score and the highest M-LMD on both datasets, and at the same time the best audio quality among protection methods (lowest WER, highest STOI and PESQ). Values are means over three seeds; standard deviations are reported in the paper. Bold marks the best protection method; GT is shown for reference.</p>
+  </section>
+</div>
+
+<!-- ==================== RESULTS: TRANSFERABILITY ==================== -->
+<div class="wrap">
+  <section id="transfer">
+    <p class="eyebrow">Results &middot; Black-box transferability</p>
+    <h2>Transfer to unseen talking-head models</h2>
+    <p>
+      Perturbations are crafted once on Hallo and fed directly to four target models the attacker might use instead. Hallo2 shares a similar architecture with the surrogate; Audio2Head, SadTalker and Ditto differ significantly in design.
+    </p>
+
+    <div class="player" data-player="transfer"></div>
+
+    <p class="table-label">Table 3: Transferability under black-box settings</p>
+    <div class="table-wrap"><table>
+<thead>
+<tr><th></th><th colspan="2" class="grp">Hallo2</th><th colspan="2" class="grp">Audio2Head</th><th colspan="2" class="grp">SadTalker</th><th colspan="2" class="grp">Ditto</th></tr>
+<tr><th>Method</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th></tr>
+</thead><tbody>
+<tr><td>C&amp;W</td><td>3.773</td><td>1.144</td><td>4.269</td><td>1.222</td><td>5.540</td><td>0.629</td><td>4.024</td><td>0.697</td></tr>
+<tr><td>Psychoacoustic</td><td>3.747</td><td>1.137</td><td>4.241</td><td>1.188</td><td>5.503</td><td>0.630</td><td>4.002</td><td>0.697</td></tr>
+<tr><td>Qin et al.</td><td>4.535</td><td>1.027</td><td>4.510</td><td>1.104</td><td>5.702</td><td>0.583</td><td>4.182</td><td>0.678</td></tr>
+<tr><td>ARO</td><td>3.546</td><td>1.192</td><td>4.182</td><td>1.203</td><td>5.297</td><td>0.658</td><td>3.803</td><td>0.781</td></tr>
+<tr><td>SAGO</td><td>3.278</td><td>1.219</td><td>4.335</td><td>1.133</td><td>5.418</td><td>0.563</td><td>3.959</td><td>0.704</td></tr>
+<tr><td>CAF</td><td>2.280</td><td>1.373</td><td>4.005</td><td>1.246</td><td>5.425</td><td>0.642</td><td>3.994</td><td>0.703</td></tr>
+<tr class="ours"><td>MUTE</td><td><b>1.397</b></td><td><b>1.679</b></td><td><b>3.627</b></td><td><b>1.299</b></td><td><b>4.703</b></td><td><b>0.864</b></td><td><b>3.457</b></td><td><b>0.884</b></td></tr>
+<tr class="ref"><td>GT</td><td>5.688</td><td>0.000</td><td>5.314</td><td>0.000</td><td>6.389</td><td>0.000</td><td>4.778</td><td>0.000</td></tr>
+</tbody></table></div>
+    <p class="table-note">MUTE achieves the lowest Sync and highest M-LMD on every target model, showing that disrupting audio&ndash;visual alignment transfers across architectures.</p>
+  </section>
+</div>
+
+<!-- ==================== RESULTS: ROBUSTNESS ==================== -->
+<div class="wrap">
+  <section id="robustness">
+    <p class="eyebrow">Results &middot; Robustness</p>
+    <h2>Post-processing, denoising and adaptive attacks</h2>
+    <p>
+      An attacker may try to clean the protected audio first. We test down/upsampling (16&rarr;8&rarr;16&nbsp;kHz) and adaptive spectral filtering, model-based denoising with Demucs and diffusion-based WavePurifier, and gradient-based adaptive attacks (BPDA, EOT) that check for gradient obfuscation.
+    </p>
+
+    <div class="player" data-player="robust"></div>
+
+    <p class="table-label">Table 4: Robustness under post-processing, denoising and adaptive attacks</p>
+    <div class="table-wrap"><table>
+<thead>
+<tr><th></th><th colspan="2" class="grp">Down/Upsampling</th><th colspan="2" class="grp">Spectral Filtering</th><th colspan="2" class="grp">Demucs</th><th colspan="2" class="grp">WavePurifier</th><th colspan="2" class="grp">BPDA</th><th colspan="2" class="grp">EOT</th></tr>
+<tr><th>Method</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th></tr>
+</thead><tbody>
+<tr><td>C&amp;W</td><td>3.791</td><td>0.971</td><td>3.884</td><td>0.987</td><td>3.968</td><td>1.031</td><td>4.071</td><td>0.940</td><td>4.878</td><td>0.557</td><td>4.834</td><td>0.542</td></tr>
+<tr><td>Psychoacoustic</td><td>3.825</td><td>0.979</td><td>3.878</td><td>1.004</td><td>3.953</td><td>1.042</td><td>4.059</td><td>0.935</td><td>4.840</td><td>0.555</td><td>4.854</td><td>0.564</td></tr>
+<tr><td>Qin et al.</td><td>4.032</td><td>0.955</td><td>4.346</td><td>0.950</td><td>4.569</td><td>0.978</td><td>3.974</td><td>0.952</td><td>4.926</td><td>0.564</td><td>4.947</td><td>0.530</td></tr>
+<tr><td>ARO</td><td>3.607</td><td>1.069</td><td>3.647</td><td>1.074</td><td>3.612</td><td>1.132</td><td>4.059</td><td>0.985</td><td>4.778</td><td>0.555</td><td>4.829</td><td>0.549</td></tr>
+<tr><td>SAGO</td><td>3.805</td><td>1.017</td><td>3.801</td><td>1.087</td><td>3.407</td><td>1.141</td><td>4.101</td><td>0.922</td><td>4.912</td><td>0.562</td><td>4.923</td><td>0.547</td></tr>
+<tr><td>CAF</td><td>3.533</td><td>1.089</td><td>3.063</td><td>1.178</td><td>2.566</td><td>1.259</td><td>3.940</td><td>0.991</td><td>4.810</td><td>0.563</td><td>4.794</td><td>0.563</td></tr>
+<tr class="ours"><td>MUTE</td><td><b>2.914</b></td><td><b>1.254</b></td><td><b>2.251</b></td><td><b>1.410</b></td><td><b>1.534</b></td><td><b>1.593</b></td><td><b>3.494</b></td><td><b>1.217</b></td><td><b>4.269</b></td><td><b>0.655</b></td><td><b>4.298</b></td><td><b>0.647</b></td></tr>
+</tbody></table></div>
+    <p class="table-note">MUTE remains the strongest method under every transformation. BPDA and EOT reduce protection for all methods, but MUTE still outperforms every baseline, indicating genuine robustness rather than gradient obfuscation.</p>
+
+    <h3>Black-box model + purification</h3>
+    <p>The hardest setting combines both: the protected audio is purified and then fed to an unseen talking-head model.</p>
+    <div class="player" data-player="transrobust"></div>
+  </section>
+</div>
+
+<!-- ==================== RESULTS: TTS ==================== -->
+<div class="wrap">
+  <section id="tts">
+    <p class="eyebrow">Results &middot; TTS resynthesis</p>
+    <h2>Resisting voice cloning with the speaker-level objective</h2>
+    <p>
+      An attacker aware of the protection could clone the speaker with TTS and synthesize fresh, perturbation-free speech. We use the protected audio as the speaker reference for CosyVoice and XTTS-v2 (white-box) and Chatterbox (black-box), then measure speaker similarity (Sim, ECAPA-TDNN) and the defense success rate (DSR: share of synthesized samples judged a different speaker, cosine similarity &le; 0.25).
+    </p>
+
+    <p class="table-label">Table 5: Effect of the optional speaker-level objective (&lambda;<sub>spk</sub>)</p>
+    <div class="table-wrap"><table>
+<thead>
+<tr><th></th><th colspan="2" class="grp">CosyVoice (white-box)</th><th colspan="2" class="grp">XTTS-v2 (white-box)</th><th colspan="2" class="grp">Chatterbox (black-box)</th><th colspan="2" class="grp">Lip-sync</th></tr>
+<tr><th>Setting</th><th>Sim&darr;</th><th>DSR&uarr;</th><th>Sim&darr;</th><th>DSR&uarr;</th><th>Sim&darr;</th><th>DSR&uarr;</th><th>Sync&darr;</th><th>M-LMD&uarr;</th></tr>
+</thead><tbody>
+<tr class="ref"><td>Unprotected</td><td>0.488</td><td>2.53</td><td>0.469</td><td>2.80</td><td>0.574</td><td>4.53</td><td>5.656</td><td>0.000</td></tr>
+<tr><td>&lambda;<sub>spk</sub> = 0</td><td>0.368</td><td>14.67</td><td>0.392</td><td>14.93</td><td>0.449</td><td>15.07</td><td>1.332</td><td>1.627</td></tr>
+<tr class="ours"><td>&lambda;<sub>spk</sub> = 0.01</td><td>0.200</td><td>67.73</td><td>&minus;0.102</td><td>99.33</td><td>0.280</td><td>43.87</td><td>1.496</td><td>1.541</td></tr>
+<tr><td>&lambda;<sub>spk</sub> = 0.05</td><td>0.180</td><td>71.47</td><td><b>&minus;0.120</b></td><td>99.47</td><td>0.248</td><td>50.40</td><td>1.918</td><td>1.465</td></tr>
+<tr><td>&lambda;<sub>spk</sub> = 0.10</td><td><b>0.170</b></td><td><b>74.13</b></td><td><b>&minus;0.120</b></td><td><b>99.73</b></td><td><b>0.239</b></td><td><b>52.67</b></td><td>2.218</td><td>1.415</td></tr>
+</tbody></table></div>
+    <p class="table-note">With &lambda;<sub>spk</sub> = 0.01, MUTE exceeds 43% DSR on all three TTS models while keeping strong lip-sync disruption (Sync 1.496, M-LMD 1.541). Larger &lambda;<sub>spk</sub> raises DSR further at some cost to alignment disruption.</p>
+  </section>
+</div>
+
+<!-- ==================== RESULTS: IMAGE + AUDIO ==================== -->
+<div class="wrap">
+  <section id="multimodal">
+    <p class="eyebrow">Results &middot; Multimodal protection</p>
+    <h2>Combining with image protection</h2>
+    <p>
+      MUTE only touches the audio, so it can be stacked with image-based protection of the portrait. Below, the portrait is protected with MIS or Silencer and the audio with CAF or MUTE.
+    </p>
+
+    <div class="player" data-player="image"></div>
+
+    <p class="table-label">Table 2: Image protection combined with voice protection</p>
+    <div class="table-wrap"><table>
+<thead>
+<tr><th>Image + Voice protection</th><th>Sync&darr;</th><th>M-LMD&uarr;</th><th>FID&uarr;</th><th>FVD&uarr;</th><th>E-FID&uarr;</th></tr>
+</thead><tbody>
+<tr><td>MIS</td><td>3.039</td><td>1.988</td><td>142.692</td><td>23.009</td><td>162.260</td></tr>
+<tr><td>Silencer</td><td>2.170</td><td>2.168</td><td>144.555</td><td>24.029</td><td>160.298</td></tr>
+<tr><td>MIS + CAF</td><td>1.212</td><td>2.157</td><td>145.166</td><td>24.526</td><td>163.048</td></tr>
+<tr><td>Silencer + CAF</td><td>0.941</td><td>2.152</td><td>146.111</td><td>25.764</td><td>165.884</td></tr>
+<tr class="ours"><td>MIS + MUTE</td><td>0.902</td><td><b>2.261</b></td><td><b>147.141</b></td><td>25.289</td><td>162.983</td></tr>
+<tr class="ours"><td>Silencer + MUTE</td><td><b>0.760</b></td><td>2.233</td><td>146.544</td><td><b>25.843</b></td><td><b>168.829</b></td></tr>
+</tbody></table></div>
+    <p class="table-note">Pairing MUTE with either image method gives lower Sync and higher M-LMD than pairing it with CAF, reaching a Sync score of 0.760 with Silencer, while keeping comparable visual-quality degradation.</p>
+  </section>
+</div>
+
+<!-- ==================== USER STUDY ==================== -->
+<div class="wrap">
+  <section id="user-study">
+    <p class="eyebrow">Results &middot; User study</p>
+    <h2>Which video is the most out of sync?</h2>
+    <div class="split">
+      <div>
+        <p>
+          Participants watched videos generated from audio protected by MUTE, CAF, ARO and SAGO and picked the one with the most noticeable lip-sync mismatch. With 100 participants and 10 samples (1,000 responses), <strong>MUTE was chosen in 78.1% &plusmn; 2.56%</strong> (95% CI) of cases, against 13.2% for CAF, 5.2% for ARO and 3.5% for SAGO.
+        </p>
+        <p><strong>Try it yourself.</strong> The clips below come from the study and are shown in a shuffled order. Pick the one you think is most out of sync, then reveal the methods.</p>
+      </div>
+      <figure class="figure-slot">
+        <img src="assets/fig4.png" alt="User study bar chart: MUTE selected in 78.1% of responses, CAF 13.2%, ARO 5.2%, SAGO 3.5%">
+        <figcaption><strong>Figure 4.</strong> Share of responses per question and in total.</figcaption>
+      </figure>
+    </div>
+
+    <div class="player quiz" data-player="quiz"></div>
+  </section>
+</div>
+
+<!-- ==================== ABLATION ==================== -->
+<div class="wrap">
+  <section id="ablation">
+    <p class="eyebrow">Ablation</p>
+    <h2>Ablation study</h2>
+    <p>
+      Effect of the phase ratio &rho; (share of iterations spent on the alignment-level objective), the STFT loss weight &lambda;, and the perturbation budget &epsilon;. Sync&darr; is reported for the alignment columns.
+    </p>
+    <div class="ablation-grid">
+      <div>
+        <p class="table-label">Table 6: Phase ratio &rho;</p>
+        <div class="table-wrap"><table>
+<thead>
+<tr><th>&rho;</th><th>Time&darr;</th><th>Hallo</th><th>Audio2Head</th><th>SadTalker</th></tr>
+</thead><tbody>
+<tr><td>1.0</td><td>78.4</td><td>3.920</td><td>3.958</td><td>5.048</td></tr>
+<tr><td>0.2</td><td>20.1</td><td>1.419</td><td>3.798</td><td>4.898</td></tr>
+<tr class="ours"><td>0.1 (ours)</td><td>12.3</td><td><b>1.332</b></td><td><b>3.627</b></td><td><b>4.703</b></td></tr>
+<tr><td>0.05</td><td>9.2</td><td>1.470</td><td>3.799</td><td>4.899</td></tr>
+<tr><td>0.0</td><td>4.8</td><td>1.427</td><td>3.904</td><td>5.063</td></tr>
+</tbody></table></div>
+        <p class="table-note">&rho; = 1 uses only the alignment-level objective, &rho; = 0 only the representation-level one. The latter is stronger and cheaper on the surrogate, the former transfers better; &rho; = 0.1 balances both.</p>
+      </div>
+      <div>
+        <p class="table-label">Table 7: STFT loss weight &lambda;</p>
+        <div class="table-wrap"><table>
+<thead>
+<tr><th>&lambda;</th><th>Clean</th><th>Down/Up</th><th>Demucs</th></tr>
+</thead><tbody>
+<tr><td>0</td><td>1.492</td><td>3.178</td><td>1.816</td></tr>
+<tr class="ours"><td>5 (ours)</td><td><b>1.332</b></td><td><b>2.914</b></td><td>1.534</td></tr>
+<tr><td>10</td><td>1.429</td><td>2.933</td><td><b>1.494</b></td></tr>
+<tr><td>20</td><td>1.451</td><td>2.971</td><td>1.564</td></tr>
+<tr><td>50</td><td>1.474</td><td>3.024</td><td>1.675</td></tr>
+</tbody></table></div>
+        <p class="table-note">Adding &Lscr;<sub>stft</sub> improves both clean protection and robustness; &lambda; = 5 gives the best balance.</p>
+      </div>
+      <div>
+        <p class="table-label">Table 8: Perturbation budget &epsilon;</p>
+        <div class="table-wrap"><table>
+<thead>
+<tr><th>&epsilon;</th><th>WER&darr;</th><th>STOI&uarr;</th><th>PESQ&uarr;</th><th>Sync&darr;</th></tr>
+</thead><tbody>
+<tr><td>0.002</td><td>10.35</td><td>0.948</td><td>2.949</td><td>1.898</td></tr>
+<tr class="ours"><td>0.004 (ours)</td><td>11.68</td><td>0.936</td><td>2.522</td><td>1.332</td></tr>
+<tr><td>0.006</td><td>12.25</td><td>0.907</td><td>2.298</td><td>1.200</td></tr>
+<tr><td>0.008</td><td>12.89</td><td>0.891</td><td>2.108</td><td>1.122</td></tr>
+<tr><td>0.010</td><td>13.30</td><td>0.885</td><td>1.945</td><td>1.027</td></tr>
+</tbody></table></div>
+        <p class="table-note">WER in %. A larger budget disrupts lip sync more but lowers audio quality; &epsilon; = 0.004 is the operating point.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== BIBTEX ==================== -->
+<div class="wrap">
+  <section id="bibtex">
+    <p class="eyebrow">Citation</p>
+    <h2>BibTeX</h2>
+    <div class="bibtex-block">
+      <button class="copy-btn" onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent.trim()); this.textContent='Copied'; setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+<pre>@inproceedings{kim2026mute,
+  title     = {MUTE: Multi-Level Alignment Uncoupling Against
+               Talking-Head Exploitation for Voice Protection},
+  author    = {Kim, Donghyun and Hong, Jin and Kim, Seungmin and
+               Kim, Dain and Kwon, Junseok and Choi, Deaseon},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2026}
+}</pre>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="wrap">
+    This work was supported in part by KISA (RS-2026-25530576) and IITP (RS-2021-II211341) grants funded by the Korea government.<br>
+    Website template inspired by <a href="https://nerfies.github.io" target="_blank">Nerfies</a>.
+    Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>.
+  </div>
+</footer>
+
+<!-- ==================== VIDEO PLAYERS ==================== -->
+<script>
+(function () {
+  const ROOT = 'assets/videos/';
+
+  const LABEL = {
+    gt: 'GT', cw: 'C&W', psy: 'Psychoacoustic', qin: 'Qin et al.', aro: 'ARO', sago: 'SAGO', caf: 'CAF', mute: 'MUTE (Ours)',
+    mis: 'MIS', mis_caf: 'MIS + CAF', mis_mute: 'MIS + MUTE (Ours)',
+    silencer: 'Silencer', silencer_caf: 'Silencer + CAF', silencer_mute: 'Silencer + MUTE (Ours)'
+  };
+  const ALL = ['gt', 'cw', 'psy', 'qin', 'aro', 'sago', 'caf', 'mute'];
+
+  // Each player: tabs -> folder under assets/videos/, items -> file names (null = empty cell, {row:'...'} = row label)
+  const PLAYERS = {
+    main: { cols: 4, items: ALL, tabs: [
+      { label: 'TalkingHead-1KH', dir: 'main/0029' },
+      { label: 'CelebV-HQ', dir: 'main/0027' } ] },
+    transfer: { cols: 4, items: ALL, tabs: [
+      { label: 'Hallo2', dir: 'transfer/hallo2' },
+      { label: 'Audio2Head', dir: 'transfer/audio2head' },
+      { label: 'SadTalker', dir: 'transfer/sadtalker' },
+      { label: 'Ditto', dir: 'transfer/ditto' } ] },
+    robust: { cols: 4, items: ALL, tabs: [
+      { label: 'Down/Upsampling', dir: 'robust/sampling' },
+      { label: 'Spectral filtering', dir: 'robust/filtering' },
+      { label: 'Demucs', dir: 'robust/demucs' },
+      { label: 'WavePurifier', dir: 'robust/wavepurifier' },
+      { label: 'BPDA', dir: 'robust/bpda' },
+      { label: 'EOT', dir: 'robust/eot' } ] },
+    transrobust: { cols: 4, items: ALL, tabs: [
+      { label: 'SadTalker + Down/Up', dir: 'transfer_robust/sadtalker_sampling' },
+      { label: 'SadTalker + Demucs', dir: 'transfer_robust/sadtalker_demucs' },
+      { label: 'SadTalker + WavePurifier', dir: 'transfer_robust/sadtalker_wavepurifier' },
+      { label: 'Audio2Head + Down/Up', dir: 'transfer_robust/audio2head_sampling' },
+      { label: 'Audio2Head + Demucs', dir: 'transfer_robust/audio2head_demucs' },
+      { label: 'Audio2Head + WavePurifier', dir: 'transfer_robust/audio2head_wavepurifier' } ] },
+    image: { cols: 4, tabs: [
+      { label: 'Sample 1', dir: 'image/0051',
+        items: ['gt', 'mis', 'mis_caf', 'mis_mute', null, 'silencer', 'silencer_caf', 'silencer_mute'] },
+      { label: 'Sample 2', dir: 'image/0012',
+        items: [null, 'mis', 'mis_caf', 'mis_mute', null, 'silencer', 'silencer_caf', 'silencer_mute'] } ] },
+    quiz: { cols: 4, quiz: true, items: ['aro', 'caf', 'mute', 'sago'], tabs: [
+      'celeb_0024', 'celeb_0026', 'celeb_0027', 'celeb_0044', 'th_0008', 'th_0029', 'th_0052'
+    ].map((d, i) => ({ label: 'Sample ' + (i + 1), dir: 'userstudy/' + d })) }
+  };
+
+  const isOurs = k => k && k.indexOf('mute') !== -1;
+
+  // deterministic shuffle so the quiz order is stable per sample
+  function shuffled(arr, seedStr) {
+    let s = 0; for (const c of seedStr) s = (s * 31 + c.charCodeAt(0)) >>> 0;
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      const j = s % (i + 1); [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const instances = [];
+
+  function Player(el, cfg) {
+    this.el = el; this.cfg = cfg; this.tab = 0; this.listen = null;
+    this.videos = []; this.playing = false; this.timer = null;
+    el.innerHTML = '';
+
+    const tabs = document.createElement('div');
+    tabs.className = 'tabs'; tabs.setAttribute('role', 'tablist');
+    cfg.tabs.forEach((t, i) => {
+      const b = document.createElement('button');
+      b.className = 'tab'; b.type = 'button'; b.textContent = t.label;
+      b.setAttribute('role', 'tab');
+      b.addEventListener('click', () => this.select(i));
+      tabs.appendChild(b);
+    });
+    this.tabsEl = tabs; el.appendChild(tabs);
+
+    this.grid = document.createElement('div');
+    this.grid.className = 'vgrid';
+    this.grid.style.setProperty('--cols', cfg.cols);
+    el.appendChild(this.grid);
+
+    const bar = document.createElement('div');
+    bar.className = 'player-bar';
+    this.playBtn = document.createElement('button');
+    this.playBtn.className = 'pbtn primary'; this.playBtn.type = 'button';
+    this.playBtn.addEventListener('click', () => this.playing ? this.pause() : this.play(true));
+    const restart = document.createElement('button');
+    restart.className = 'pbtn'; restart.type = 'button'; restart.textContent = '↺ Restart';
+    restart.addEventListener('click', () => this.play(true));
+    this.now = document.createElement('span'); this.now.className = 'now';
+    bar.append(this.playBtn, restart, this.now);
+    if (cfg.quiz) {
+      this.revealBtn = document.createElement('button');
+      this.revealBtn.className = 'pbtn'; this.revealBtn.type = 'button';
+      this.revealBtn.addEventListener('click', () => { el.classList.toggle('revealed'); this.updateUI(); });
+      bar.appendChild(this.revealBtn);
+    }
+    const hint = document.createElement('span'); hint.className = 'hint';
+    hint.textContent = 'Click a video to listen to its audio. All videos play in sync.';
+    bar.appendChild(hint);
+    el.appendChild(bar);
+
+    this.select(0);
+  }
+
+  Player.prototype.select = function (i) {
+    this.pause();
+    this.tab = i;
+    [...this.tabsEl.children].forEach((b, j) => b.setAttribute('aria-selected', j === i ? 'true' : 'false'));
+    if (this.cfg.quiz) this.el.classList.remove('revealed');
+    const t = this.cfg.tabs[i];
+    let items = t.items || this.cfg.items;
+    if (this.cfg.quiz) items = shuffled(items, t.dir);
+    this.grid.innerHTML = ''; this.videos = [];
+    items.forEach((k, idx) => {
+      if (!k) { const e = document.createElement('div'); e.className = 'tile empty'; e.textContent = '—'; this.grid.appendChild(e); return; }
+      const tile = document.createElement('div');
+      tile.className = 'tile' + (isOurs(k) ? ' ours' : '');
+      tile.tabIndex = 0; tile.setAttribute('role', 'button');
+      const v = document.createElement('video');
+      v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+      v.setAttribute('playsinline', ''); v.setAttribute('muted', '');
+      v.poster = ROOT + t.dir + '/' + k + '.jpg';
+      v.src = ROOT + t.dir + '/' + k + '.mp4';
+      v.dataset.key = k;
+      const cap = document.createElement('div'); cap.className = 'cap';
+      const name = document.createElement('span');
+      if (this.cfg.quiz) {
+        name.innerHTML = '<strong>' + String.fromCharCode(65 + idx) + '</strong> <span class="who">· ' + LABEL[k] + '</span>';
+      } else {
+        name.textContent = LABEL[k] || k;
+      }
+      const spk = document.createElement('span'); spk.className = 'spk'; spk.textContent = '🔊';
+      cap.append(name, spk);
+      tile.append(v, cap);
+      const choose = () => { this.setListen(v); if (!this.playing) this.play(false); };
+      tile.addEventListener('click', choose);
+      tile.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); } });
+      this.grid.appendChild(tile);
+      this.videos.push(v);
+    });
+    const keep = this.videos.find(v => this.listen && v.dataset.key === this.listen.dataset.key);
+    this.listen = this.cfg.quiz ? this.videos[0]
+      : (keep || this.videos.find(v => isOurs(v.dataset.key)) || this.videos[0]);
+    this.updateUI();
+  };
+
+  Player.prototype.setListen = function (v) {
+    this.listen = v;
+    this.videos.forEach(x => { x.muted = (x !== v); });
+    this.updateUI();
+  };
+
+  Player.prototype.play = function (fromStart) {
+    instances.forEach(p => { if (p !== this) p.pause(); });
+    if (fromStart) this.videos.forEach(v => { try { v.currentTime = 0; } catch (e) {} });
+    this.videos.forEach(v => { v.muted = (v !== this.listen); });
+    this.videos.forEach(v => { const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); });
+    this.playing = true;
+    clearInterval(this.timer);
+    this.timer = setInterval(() => this.sync(), 300);
+    this.updateUI();
+  };
+
+  Player.prototype.pause = function () {
+    this.videos.forEach(v => v.pause());
+    this.playing = false;
+    clearInterval(this.timer);
+    if (this.playBtn) this.updateUI();
+  };
+
+  // keep every video aligned to the one being listened to
+  Player.prototype.sync = function () {
+    const m = this.listen; if (!m) return;
+    const t = m.currentTime;
+    this.videos.forEach(v => {
+      if (v === m || !v.duration) return;
+      const target = Math.min(t, v.duration - 0.05);
+      if (Math.abs(v.currentTime - target) > 0.1) v.currentTime = target;
+      if (v.paused && !m.paused) { const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); }
+    });
+  };
+
+  Player.prototype.updateUI = function () {
+    this.playBtn.textContent = this.playing ? '❚❚ Pause' : '▶ Play all';
+    const revealed = this.el.classList.contains('revealed');
+    [...this.grid.querySelectorAll('.tile:not(.empty)')].forEach(tile => {
+      tile.classList.toggle('listening', tile.querySelector('video') === this.listen);
+    });
+    if (this.listen) {
+      const k = this.listen.dataset.key;
+      let name = LABEL[k];
+      if (this.cfg.quiz) {
+        const idx = this.videos.indexOf(this.listen);
+        name = String.fromCharCode(65 + idx) + (revealed ? ' (' + LABEL[k] + ')' : '');
+      }
+      this.now.innerHTML = '🔊 Listening to: <strong></strong>';
+      this.now.querySelector('strong').textContent = name;
+    }
+    if (this.revealBtn) this.revealBtn.textContent = revealed ? 'Hide methods' : 'Reveal methods';
+  };
+
+  document.querySelectorAll('[data-player]').forEach(el => {
+    const cfg = PLAYERS[el.dataset.player];
+    if (cfg) instances.push(new Player(el, cfg));
+  });
+
+  // pause players that scroll out of view
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      if (!e.isIntersecting) { const p = instances.find(p => p.el === e.target); if (p && p.playing) p.pause(); }
+    }), { threshold: 0.15 });
+    instances.forEach(p => io.observe(p.el));
+  }
+})();
+</script>
+
+</body>
+</html>
