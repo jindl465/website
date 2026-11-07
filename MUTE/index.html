@@ -223,6 +223,17 @@
       overflow-x: auto;
       white-space: nowrap;
     }
+    /* after KaTeX renders the formula */
+    .eq.tex {
+      font-family: inherit;
+      font-size: 1rem;
+      text-align: center;
+      padding: 10px 16px;
+      margin: 10px 0 4px;
+      border-radius: 8px;
+    }
+    .eq.tex .katex { font-size: 1.12em; }
+    .eq.tex .katex-display { margin: 0; }
 
     /* ========== Video comparison players ========== */
     .player { margin: 20px 0 8px; }
@@ -520,6 +531,10 @@
       }
     }
   </style>
+  <!-- KaTeX for formulas (plain-text fallback stays if it fails to load) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"
+    onload="document.querySelectorAll('.eq[data-tex]').forEach(function (el) { try { katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: true }); el.classList.add('tex'); } catch (e) {} });"></script>
 </head>
 <body>
 
@@ -600,11 +615,11 @@
 
     <ul class="loss-list">
       <li><strong>Alignment-level disruption (&Lscr;<sub>attn</sub>).</strong> The audio-conditioned cross-attention in the denoising UNet (visual latents as queries, audio embeddings as keys/values) is treated as a proxy for the alignment structure. A Taylor-expansion sensitivity score identifies the spatial locations whose attention can be shifted most under an &epsilon;-bounded perturbation, defining a target distribution <i>A</i><sub>target</sub> = softmax(<i>s</i>). A <em>Target Attention KL loss</em> then pushes the adversarial attention toward it.
-        <span class="eq">L_attn = KL( A_target || A_adv )</span></li>
+        <span class="eq" data-tex="\mathcal{L}_{\mathrm{attn}} = \mathrm{KL}\left(A^{\mathrm{target}} \,\|\, A^{\mathrm{adv}}\right)">L_attn = KL( A_target || A_adv )</span></li>
       <li><strong>Representation-level degradation (&Lscr;<sub>emb</sub>).</strong> Talking-head models drive frame-level motion from temporal wav2vec&nbsp;2.0 embeddings, so perturbing only a global embedding is not enough. The <em>Frame-wise Embedding Cosine loss</em> lowers the similarity at every time step, preventing local perturbations from being averaged away.
-        <span class="eq">L_emb = (1/T) &Sigma;_t cos( z_t^adv , z_t )</span></li>
+        <span class="eq" data-tex="\mathcal{L}_{\mathrm{emb}} = \frac{1}{T} \sum_{t=1}^{T} \cos\left(z_t^{\mathrm{adv}},\, z_t\right)">L_emb =(1/T) &Sigma;_t cos( z_t^adv , z_t )</span></li>
       <li><strong>Robustness to post-processing, denoising and adaptive attacks (&Lscr;<sub>stft</sub>).</strong> A mask <i>M</i> built from the clean spectrogram keeps the perturbation in high-energy time&ndash;frequency regions of the speech itself, where filters and denoisers cannot remove it without also removing the speech.
-        <span class="eq">L_stft = || &delta; &minus; ISTFT( M &odot; STFT(&delta;) ) ||&sup2;</span></li>
+        <span class="eq" data-tex="\mathcal{L}_{\mathrm{stft}} = \left\| \delta - \mathrm{ISTFT}\left(M \odot \mathrm{STFT}(\delta)\right) \right\|_2^2">L_stft =|| &delta; &minus; ISTFT( M &odot; STFT(&delta;) ) ||&sup2;</span></li>
       <li><strong>Speaker-level objective (&Lscr;<sub>spk</sub>, optional).</strong> To resist an attacker who clones the voice with TTS, MUTE can also lower speaker-embedding similarity using an ensemble of CAM++ and a ResNet speaker encoder.</li>
       <li><strong>Two-phase optimization.</strong> The first &rho;K iterations minimize &Lscr;<sub>attn</sub> + &lambda;&Lscr;<sub>stft</sub>; the remaining ones minimize &Lscr;<sub>emb</sub> + &lambda;&Lscr;<sub>stft</sub>. Separating the objectives reduces gradient interference and cost (&rho; = 0.1, &lambda; = 5, &epsilon; = 0.004, 200 PGD steps).</li>
     </ul>
